@@ -1,4 +1,4 @@
-from data_accelerator.spark_functions import add_column
+from turbine_ingestion.spark_functions import add_column
 
 
 def test_my_functions(spark):

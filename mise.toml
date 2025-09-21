@@ -4,6 +4,9 @@ java = "17"
 databricks-cli = "0.245.0"
 spark = "3.5.5"
 
+[env]
+_.file = { path = ".env", redact = true }
+
 [settings]
 python.uv_venv_auto = true
 
