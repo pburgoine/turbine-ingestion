@@ -8,8 +8,9 @@ include:
 
 variables:
   workspace_user:
-    description: The user for the databricks workspace
-    default: pdburgoine@gmail.com
+    description: The user for the databricks workspace.
+  catalog:
+    description: The catalog for deploying pipelines and data to.
 
 targets:
   dev:

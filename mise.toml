@@ -29,3 +29,28 @@ quiet = true
 description = "Run all pytest tests using Spark Connect (make sure it is running first)"
 run = "uv run pytest --connect"
 quiet = true
+
+[tasks.db-val]
+description = "Validate Databricks Asset Bundle"
+run = "uv run databricks bundle validate"
+quiet = true
+
+[tasks.db-deploy]
+description = "Deploy Databricks Asset Bundle"
+run = "uv run databricks bundle deploy"
+quiet = true
+
+[tasks.db-destroy]
+description = "Deploy Databricks Asset Bundle"
+run = "uv run databricks bundle destroy --auto-approve"
+quiet = true
+
+[tasks.ruff-fmt]
+description = "Run ruff format"
+run = "uv run ruff format"
+quiet = true
+
+[tasks.ruff-chk]
+description = "Run run ruff check -- fix"
+run = "uv run ruff check --fix"
+quiet = true
