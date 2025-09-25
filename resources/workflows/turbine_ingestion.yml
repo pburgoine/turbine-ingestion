@@ -13,5 +13,5 @@ resources:
 
       configuration:
         bundle.sourcePath: ${workspace.file_path}/src
-        raw_turbine_data_path: /Volumes/main/landing/raw/
+        raw_turbine_data_path: ${var.raw_turbine_data_path}
 

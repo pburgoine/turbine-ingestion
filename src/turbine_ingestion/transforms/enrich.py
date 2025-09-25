@@ -8,8 +8,10 @@ AggregationLevel = Literal[
     "DAY",
 ]
 
+
 class AggregationLevelError(Exception):
     """Raised when an invalid aggregation level is used."""
+
     pass
 
 
@@ -56,7 +58,9 @@ def compute_aggregates(df: DataFrame, level: AggregationLevel) -> DataFrame:
         case "HOUR":
             format = "hh:mm"
         case _:
-            raise AggregationLevelError("Aggregation level should be 'HOUR' or 'DAY' only.")
+            raise AggregationLevelError(
+                "Aggregation level should be 'HOUR' or 'DAY' only."
+            )
 
     format = "yyyy-MM-dd" if level == "DAY" else "hh:mm"
 

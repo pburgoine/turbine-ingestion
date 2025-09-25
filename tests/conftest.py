@@ -1,18 +1,21 @@
 from datetime import UTC, datetime
 
 import pyspark.sql.types as st
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 
 import pytest
 
-AGGREGATE_DF_SCHEMA = st.StructType([
+AGGREGATE_DF_SCHEMA = st.StructType(
+    [
         st.StructField("turbine_id", st.IntegerType(), False),
         st.StructField("period", st.StringType(), False),
         st.StructField("min_power_output", st.DoubleType(), True),
         st.StructField("avg_power_output", st.DoubleType(), True),
         st.StructField("max_power_output", st.DoubleType(), True),
         st.StructField("stddev_power_output", st.DoubleType(), True),
-    ])
+    ]
+)
+
 
 def pytest_addoption(parser):
     parser.addoption("--connect", action="store_true", default=None)
@@ -39,6 +42,7 @@ def spark(use_connect) -> SparkSession:
         )
     return spark_session
 
+
 AGGREGATE_DF_SCHEMA = st.StructType(
     [
         st.StructField("turbine_id", st.IntegerType(), False),
@@ -49,6 +53,7 @@ AGGREGATE_DF_SCHEMA = st.StructType(
         st.StructField("stddev_power_output", st.DoubleType(), True),
     ]
 )
+
 
 @pytest.fixture(scope="session")
 def input_df(spark: SparkSession) -> DataFrame:
@@ -61,11 +66,12 @@ def input_df(spark: SparkSession) -> DataFrame:
     )
     rows = [
         (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 150.0),
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0), 
-        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0),  
+        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0),
+        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0),
         (1, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0),
     ]
     return spark.createDataFrame(rows, schema)
+
 
 @pytest.fixture(scope="session")
 def lookup_df(spark: SparkSession) -> DataFrame:
@@ -83,6 +89,7 @@ def lookup_df(spark: SparkSession) -> DataFrame:
     ]
     return spark.createDataFrame(rows, schema)
 
+
 @pytest.fixture(scope="session")
 def expected_anomaly_df(spark: SparkSession) -> DataFrame:
     schema = st.StructType(
@@ -94,12 +101,13 @@ def expected_anomaly_df(spark: SparkSession) -> DataFrame:
         ]
     )
     rows = [
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 150.0, True),  
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0, False), 
-        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0, False),  
-        (1, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0, False),  
+        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 150.0, True),
+        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0, False),
+        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0, False),
+        (1, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0, False),
     ]
     return spark.createDataFrame(rows, schema)
+
 
 @pytest.fixture(scope="session")
 def expected_hour_df(spark: SparkSession) -> DataFrame:
@@ -109,6 +117,7 @@ def expected_hour_df(spark: SparkSession) -> DataFrame:
         (2, "02:00", 500.0, 500.0, 500.0, None),
     ]
     return spark.createDataFrame(rows, AGGREGATE_DF_SCHEMA)
+
 
 @pytest.fixture(scope="session")
 def expected_day_df(spark: SparkSession) -> DataFrame:

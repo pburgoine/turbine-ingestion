@@ -11,6 +11,8 @@ variables:
     description: The user for the databricks workspace.
   catalog:
     description: The catalog for deploying pipelines and data to.
+  raw_turbine_data_path:
+    description: The path for the raw data, best as a volume.
 
 targets:
   dev:
