@@ -8,6 +8,10 @@ AggregationLevel = Literal[
     "DAY",
 ]
 
+class AggregationLevelError(Exception):
+    """Raised when an invalid aggregation level is used."""
+    pass
+
 
 def flag_anomalies(df: DataFrame, lookup_df: DataFrame) -> DataFrame:
     """Static join to hourly aggregate table to determine outliers.
@@ -38,11 +42,22 @@ def flag_anomalies(df: DataFrame, lookup_df: DataFrame) -> DataFrame:
             ),
             sf.lit(True),
         ).otherwise(sf.lit(False)),
-    ).select("l.*")
+    ).select(
+        "l.*",
+        "is_anomaly",
+    )
 
 
 def compute_aggregates(df: DataFrame, level: AggregationLevel) -> DataFrame:
     """Compute summary statistics table at turbine level over given time period."""
+    match level:
+        case "DAY":
+            format = "yyyy-MM-dd"
+        case "HOUR":
+            format = "hh:mm"
+        case _:
+            raise AggregationLevelError("Aggregation level should be 'HOUR' or 'DAY' only.")
+
     format = "yyyy-MM-dd" if level == "DAY" else "hh:mm"
 
     return (
