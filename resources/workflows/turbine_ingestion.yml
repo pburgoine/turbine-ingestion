@@ -1,0 +1,17 @@
+resources:
+  pipelines:
+    pipeline_turbine_ingestion:
+      name: turbine_ingestion
+      schema: ${bundle.environment}
+      serverless: true
+      continuous: false
+      development: true
+      catalog: ${var.catalog}
+      libraries:
+        - notebook:
+            path: ../notebooks/turbine_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: ${workspace.file_path}/src
+        raw_turbine_data_path: ${var.raw_turbine_data_path}
+
