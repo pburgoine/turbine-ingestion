@@ -62,8 +62,6 @@ def compute_aggregates(df: DataFrame, level: AggregationLevel) -> DataFrame:
                 "Aggregation level should be 'HOUR' or 'DAY' only."
             )
 
-    format = "yyyy-MM-dd" if level == "DAY" else "hh:mm"
-
     return (
         df.withColumn("period", sf.date_format(sf.col("timestamp"), format))
         .groupBy("turbine_id", "period")
@@ -72,5 +70,14 @@ def compute_aggregates(df: DataFrame, level: AggregationLevel) -> DataFrame:
             sf.avg(sf.col("power_output")).alias("avg_power_output"),
             sf.max(sf.col("power_output")).alias("max_power_output"),
             sf.stddev(sf.col("power_output")).alias("stddev_power_output"),
+        )
+    )
+
+
+def apply_latest_filter(df: DataFrame) -> DataFrame:
+    """Returns only the latest power output based on modification time."""
+    return df.groupBy("turbine_id", "timestamp").agg(
+        sf.max_by(sf.col("power_output"), sf.col("file_modification_time")).alias(
+            "power_output"
         )
     )
