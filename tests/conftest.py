@@ -62,13 +62,34 @@ def input_df(spark: SparkSession) -> DataFrame:
             st.StructField("turbine_id", st.IntegerType(), False),
             st.StructField("timestamp", st.TimestampType(), False),
             st.StructField("power_output", st.DoubleType(), False),
+            st.StructField("file_modification_time", st.TimestampType(), False),
         ]
     )
     rows = [
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 150.0),
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0),
-        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0),
-        (1, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0),
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            150.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            130.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            2,
+            datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC),
+            500.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            1,
+            datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC),
+            140.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
     ]
     return spark.createDataFrame(rows, schema)
 
@@ -97,14 +118,39 @@ def expected_anomaly_df(spark: SparkSession) -> DataFrame:
             st.StructField("turbine_id", st.IntegerType(), False),
             st.StructField("timestamp", st.TimestampType(), False),
             st.StructField("power_output", st.DoubleType(), False),
+            st.StructField("file_modification_time", st.TimestampType(), False),
             st.StructField("is_anomaly", st.BooleanType(), False),
         ]
     )
     rows = [
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 150.0, True),
-        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0, False),
-        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0, False),
-        (1, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0, False),
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            150.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+            True,
+        ),
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            130.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+            False,
+        ),
+        (
+            2,
+            datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC),
+            500.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+            False,
+        ),
+        (
+            1,
+            datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC),
+            140.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+            False,
+        ),
     ]
     return spark.createDataFrame(rows, schema)
 
@@ -126,3 +172,72 @@ def expected_day_df(spark: SparkSession) -> DataFrame:
         (2, "2025-01-01", 500.0, 500.0, 500.0, None),
     ]
     return spark.createDataFrame(rows, AGGREGATE_DF_SCHEMA)
+
+
+@pytest.fixture(scope="session")
+def duplicate_df(spark: SparkSession) -> DataFrame:
+    schema = st.StructType(
+        [
+            st.StructField("turbine_id", st.IntegerType(), False),
+            st.StructField("timestamp", st.TimestampType(), False),
+            st.StructField("power_output", st.DoubleType(), False),
+            st.StructField("file_modification_time", st.TimestampType(), False),
+        ]
+    )
+    rows = [
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            150.0,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            1,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+            130.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            2,
+            datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC),
+            400.0,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            2,
+            datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC),
+            500.0,
+            datetime(2025, 1, 2, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            2,
+            datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC),
+            90.0,
+            datetime(2025, 1, 3, 1, 0, 0, tzinfo=UTC),
+        ),
+        (
+            3,
+            datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC),
+            140.0,
+            datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC),
+        ),
+    ]
+    return spark.createDataFrame(rows, schema)
+
+
+@pytest.fixture(scope="session")
+def expected_deduplicated_df(spark: SparkSession) -> DataFrame:
+    schema = st.StructType(
+        [
+            st.StructField("turbine_id", st.IntegerType(), False),
+            st.StructField("timestamp", st.TimestampType(), False),
+            st.StructField("power_output", st.DoubleType(), False),
+        ]
+    )
+    rows = [
+        (1, datetime(2025, 1, 1, 1, 0, 0, tzinfo=UTC), 130.0),
+        (2, datetime(2025, 1, 1, 2, 0, 0, tzinfo=UTC), 500.0),
+        (2, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 90.0),
+        (3, datetime(2025, 1, 1, 3, 0, 0, tzinfo=UTC), 140.0),
+    ]
+    return spark.createDataFrame(rows, schema)

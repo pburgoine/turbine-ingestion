@@ -34,6 +34,6 @@
 - Reuse spark functions where possible (compute_aggregates), and store these in python module that is imported to the notebook.
 - Unit test functions using local pyspark and pytest (or in CICD), without relying on Databricks.
 - Deploying in dev mode via asset bundles allows for isolated testing of pipelines as deploys resources with name end environment appended to job and environment as the schema.
-- I do not think Declarative pipelines are a necessarily a good choice for Autoloader, however wanted to showcase declarative pipelines.
-- I have modified the datasets and added extra data, and verified that the silver enriched table is properly deduplicated.
-- I would have properly deduplicated the aggregate tables if I had time.
+- I do not think Declarative pipelines are a necessarily a good choice for this type of appended data, however wanted to showcase declarative pipelines.
+- I have modified the datasets and added extra data, and verified that the silver enriched table is properly deduplicated and the aggregate tables recalculate.
+

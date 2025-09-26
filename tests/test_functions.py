@@ -3,7 +3,7 @@ from pyspark.testing import assertDataFrameEqual
 
 import pytest
 
-from turbine_ingestion import compute_aggregates, flag_anomalies
+from turbine_ingestion import apply_latest_filter, compute_aggregates, flag_anomalies
 from turbine_ingestion.transforms.enrich import AggregationLevel, AggregationLevelError
 
 
@@ -12,7 +12,10 @@ def test_flag_anomalies(
 ):
     df = input_df.transform(lambda df: flag_anomalies(df, lookup_df))
 
-    assertDataFrameEqual(df, expected_anomaly_df)
+    assertDataFrameEqual(
+        df,
+        expected_anomaly_df,
+    )
 
 
 @pytest.mark.parametrize(
@@ -28,3 +31,9 @@ def test_compute_aggregates(
 def test_compute_aggregates_raises_error_for_wrong_level(input_df: DataFrame):
     with pytest.raises(AggregationLevelError):
         input_df.transform(lambda df: compute_aggregates(df, "WRONG_LEVEL"))  # pyright: ignore[reportArgumentType]
+
+def test_apply_latest_filter(
+    duplicate_df: DataFrame, expected_deduplicated_df: DataFrame
+):
+    df = duplicate_df.transform(apply_latest_filter)
+    assertDataFrameEqual(df, expected_deduplicated_df)
