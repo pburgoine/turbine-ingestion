@@ -36,3 +36,4 @@
 - Deploying in dev mode via asset bundles allows for isolated testing of pipelines as deploys resources with name end environment appended to job and environment as the schema.
 - I do not think Declarative pipelines are a necessarily a good choice for this type of appended data, however wanted to showcase declarative pipelines.
 - I have modified the datasets and added extra data, and verified that the silver enriched table is properly deduplicated and the aggregate tables recalculate.
+

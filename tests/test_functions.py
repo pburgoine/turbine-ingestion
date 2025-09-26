@@ -32,7 +32,6 @@ def test_compute_aggregates_raises_error_for_wrong_level(input_df: DataFrame):
     with pytest.raises(AggregationLevelError):
         input_df.transform(lambda df: compute_aggregates(df, "WRONG_LEVEL"))  # pyright: ignore[reportArgumentType]
 
-
 def test_apply_latest_filter(
     duplicate_df: DataFrame, expected_deduplicated_df: DataFrame
 ):
